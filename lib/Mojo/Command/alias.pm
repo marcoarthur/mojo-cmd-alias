@@ -1,11 +1,36 @@
 package Mojo::Command::alias;
-use 5.008001;
-use strict;
-use warnings;
 
-our $VERSION = "0.01";
+use 5.010;
+use Mojo::Base 'Mojolicious::Command', -signatures;
+use Cwd;
+use File::Spec;
+use FindBin qw($Bin $RealScript);
+use DDP;
 
+has description => "generate bash aliases for application\n";
+has usage => "Usage: app alias | eval \$(app alias)\n";
 
+sub _cmd_alias( $self, $aliaser ) {
+    my $cwd = getcwd;
+    my $cmd = $FindBin::RealScript;
+    my $abs = $FindBin::Bin;
+    my $rel_path = File::Spec->abs2rel($abs, $cwd);
+    $cmd = File::Spec->catfile($rel_path, $cmd);
+
+    my %cmds = (
+        routes => "$cmd routes",
+        get    => "$cmd get -M GET",
+        post   => "$cmd get -M POST",
+    );
+
+    return map { "$aliaser $_='$cmds{$_}'" } keys %cmds;
+}
+
+sub run ( $self, @args ) {
+    my $aliaser = 'alias';
+
+    say join "\n", $self->_cmd_alias($aliaser); 
+}
 
 1;
 __END__
@@ -14,15 +39,21 @@ __END__
 
 =head1 NAME
 
-Mojo::Command::alias - It's new $module
+Mojo::Command::alias - Command alias to your appliacation.
 
 =head1 SYNOPSIS
 
-    use Mojo::Command::alias;
+    mojo generate app mojo-app
+    cd mojo-app
+    eval $(./script/mojo-app alias)
+    app routes
+    get /some/route
+    post /some/route -c "{ some: 'data' }"
+    delete /some/route/id
 
 =head1 DESCRIPTION
 
-Mojo::Command::alias is ...
+Mojo::Command::alias create shell aliases for your mojo app
 
 =head1 LICENSE
 
