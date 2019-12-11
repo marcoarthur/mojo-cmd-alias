@@ -2,8 +2,7 @@ package Mojo::Command::alias;
 
 use 5.010;
 use Mojo::Base 'Mojolicious::Command', -signatures;
-use Cwd;
-use File::Spec;
+use Mojo::File;
 use FindBin qw($Bin $RealScript);
 use DDP;
 
@@ -11,16 +10,15 @@ has description => "generate bash aliases for application\n";
 has usage => "Usage: app alias | eval \$(app alias)\n";
 
 sub _cmd_alias( $self, $aliaser ) {
-    my $cwd = getcwd;
-    my $cmd = $FindBin::RealScript;
-    my $abs = $FindBin::Bin;
-    my $rel_path = File::Spec->abs2rel($abs, $cwd);
-    $cmd = File::Spec->catfile($rel_path, $cmd);
+    
+    my $path = Mojo::File->new($FindBin::Bin)->child($FindBin::RealScript);
+    my $cmd = $path->to_rel(Mojo::File->new); # relative path
+
 
     my %cmds = (
-        routes => "$cmd routes",
-        get    => "$cmd get -M GET",
-        post   => "$cmd get -M POST",
+        routes => "./$cmd routes",
+        get    => "./$cmd get -M GET",
+        post   => "./$cmd get -M POST",
     );
 
     return map { "$aliaser $_='$cmds{$_}'" } keys %cmds;
