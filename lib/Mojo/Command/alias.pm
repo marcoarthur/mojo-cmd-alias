@@ -4,24 +4,30 @@ use 5.010;
 use Mojo::Base 'Mojolicious::Command', -signatures;
 use Mojo::File;
 use FindBin qw($Bin $RealScript);
+use String::ShellQuote;
 use DDP;
 
 has description => "generate bash aliases for application\n";
-has usage => "Usage: app alias | eval \$(app alias)\n";
+has usage => "Usage: app alias | eval \"\$(app alias)\"\n";
 
 sub _cmd_alias( $self, $aliaser ) {
-    # relative path to script
-    my $path = Mojo::File->new($FindBin::Bin)->to_rel(Mojo::File->new);
-    my $cmd = $path->child($FindBin::RealScript);
-
+    # absolute path
+    my $cmd = Mojo::File->new($FindBin::Bin)->child($FindBin::RealScript);
 
     my %cmds = (
+        app    => "$cmd",
         routes => "$cmd routes",
         get    => "$cmd get -M GET",
         post   => "$cmd get -M POST",
+        delete => "$cmd get -M DELETE",
+        patch  => "$cmd get -M PATCH",
+        put    => "$cmd get -M PUT",
     );
 
-    return map { "$aliaser $_='$cmds{$_}'" } keys %cmds;
+    return map {
+        my $arg = shell_quote ( "$^X $cmds{$_}" );
+        "$aliaser $_=$arg" 
+    } keys %cmds;
 }
 
 sub run ( $self, @args ) {
@@ -44,14 +50,19 @@ Mojo::Command::alias - Command alias to your appliacation.
     mojo generate app mojo-app
     cd mojo-app
     eval $(./script/mojo-app alias)
+    app
     app routes
+    routes
     get /some/route
     post /some/route -c "{ some: 'data' }"
     delete /some/route/id
 
 =head1 DESCRIPTION
 
-Mojo::Command::alias create shell aliases for your mojo app
+Mojo::Command::alias create shell aliases for your mojo app.
+The application name is set to "app" . You also get alias for get, post,
+delete, put, patch (REST verbs). You can check all the aliases created by
+running it.
 
 =head1 LICENSE
 
