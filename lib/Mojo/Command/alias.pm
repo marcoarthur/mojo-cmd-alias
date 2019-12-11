@@ -10,15 +10,15 @@ has description => "generate bash aliases for application\n";
 has usage => "Usage: app alias | eval \$(app alias)\n";
 
 sub _cmd_alias( $self, $aliaser ) {
-    
-    my $path = Mojo::File->new($FindBin::Bin)->child($FindBin::RealScript);
-    my $cmd = $path->to_rel(Mojo::File->new); # relative path
+    # relative path to script
+    my $path = Mojo::File->new($FindBin::Bin)->to_rel(Mojo::File->new);
+    my $cmd = $path->child($FindBin::RealScript);
 
 
     my %cmds = (
-        routes => "./$cmd routes",
-        get    => "./$cmd get -M GET",
-        post   => "./$cmd get -M POST",
+        routes => "$cmd routes",
+        get    => "$cmd get -M GET",
+        post   => "$cmd get -M POST",
     );
 
     return map { "$aliaser $_='$cmds{$_}'" } keys %cmds;
