@@ -1,14 +1,25 @@
 # NAME
 
-Mojo::Command::alias - It's new $module
+Mojo::Command::alias - Command alias to your appliacation.
 
 # SYNOPSIS
 
-    use Mojo::Command::alias;
+    mojo generate app mojo-app
+    cd mojo-app
+    eval $(./script/mojo-app alias)
+    app
+    app routes
+    routes
+    get /some/route
+    post /some/route -c "{ some: 'data' }"
+    delete /some/route/id
 
 # DESCRIPTION
 
-Mojo::Command::alias is ...
+Mojo::Command::alias create shell aliases for your mojo app.
+The application name is set to "app" . You also get alias for get, post,
+delete, put, patch (REST verbs). You can check all the aliases created by
+running it.
 
 # LICENSE
 

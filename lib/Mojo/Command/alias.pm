@@ -7,6 +7,8 @@ use FindBin qw($Bin $RealScript);
 use String::ShellQuote;
 use DDP;
 
+our $VERSION = "0.01";
+
 has description => "generate bash aliases for application\n";
 has usage => "Usage: app alias | eval \"\$(app alias)\"\n";
 
