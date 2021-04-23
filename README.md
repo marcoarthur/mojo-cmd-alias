@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/marcoarthur/mojo-cmd-alias.svg?branch=master)](https://travis-ci.com/marcoarthur/mojo-cmd-alias)
 # NAME
 
 Mojo::Command::alias - Command alias to your appliacation.
